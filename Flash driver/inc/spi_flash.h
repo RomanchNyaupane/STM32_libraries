@@ -1,7 +1,39 @@
+/* 
+SPI Flash Library - Consecutive Write Focus
+Features:
+- Sequential writes only (no random access)
+- Auto address tracking (page/sector/block)
+- Sector erase with safety rules
+- Status tracking for operations
+- Page boundary handling in batch writes
+
+Usage Rules:
+1. Writes must be consecutive to last address
+2. Erase active sector only (or previous if flagged)
+3. Batch writes auto-wrap across pages
+
+Status Bits (status):
+bit0: byte write fail
+bit1: byte read fail  
+bit3: batch write fail
+bit4: sector erase fail
+bit5: illegal erase attempt
+
+TODO/Remaining:
+- Error handling & timeouts
+- Block erase (64KB) function
+- Write protection commands
+- DMA optimization
+- Async operation support
+- Unit tests
+- Logging system
+*/
+
+
 #ifndef SPI_FLASH_LIB_H
 #define SPI_FLASH_LIB_H
 #include "stm32wbxx_hal.h"
-#include "stm32wbxx_hal_spi.h"s
+#include "stm32wbxx_hal_spi.h"
 
 #define FLASH_TRUE 00
 #define FLASH_FALSE 01
@@ -61,9 +93,9 @@ void flash_write_dis(void);
 
 uint8_t flash_read_status_1(void);
 uint8_t flash_read_byte(uint32_t); //simple byte read
+uint8_t flash_read_batch(uint32_t ,uint8_t *, uint16_t);
 void flash_write_byte(uint32_t, uint8_t); //simple byte write
-uint8_t flash_batch_write(uint32_t, uint8_t*);
-
+uint8_t flash_write_batch(uint32_t, uint8_t *, uint16_t);
 void flash_chip_erase(void);
 void flash_sector_erase(uint32_t);
 
